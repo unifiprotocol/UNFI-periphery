@@ -54,6 +54,7 @@ contract UnifiProtocolVotingToken is
     // transfer the tokens to this contract
     /** @notice Be mindful of reentrancy attack here */
     //emit event
+    s_unfiAddress.approve(address(this), amount);
     bool success = s_unfiAddress.transferFrom(msg.sender, address(this), amount);
     if (!success) {
       revert Staking__TransferFailed();
