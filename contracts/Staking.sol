@@ -11,7 +11,7 @@ error Staking__NeedsMoreThanZero();
 abstract contract Staking {
     IERC20 public s_unfiAddress;
 
-    uint256 public rewardRate = 213333333333333333333333; // Tokens in Wei per block rewards to stakers. This amount is based on 10,000 distributed every 30 days.
+    uint256 public rewardRate = 1851428571; // Tokens in Wei per block rewards to stakers. This amount is based on 10,000 distributed every 30 days.
     uint256 public s_totalSupply;
     uint256 public s_rewardPerTokenStored;
     uint256 public s_lastUpdateTime;
@@ -27,7 +27,7 @@ abstract contract Staking {
 
     modifier updateReward(address account) {
         s_rewardPerTokenStored = rewardPerToken(); // Updates Reward Per Block
-        s_lastUpdateTime = block.timestamp; // Updates Timestamp
+        s_lastUpdateTime = block.number; // Updates Timestamp
         s_rewards[account] = earned(account); // Updates Amount Account has Earned
         s_userRewardPerTokenPaid[account] = s_rewardPerTokenStored; //Updates Amount Users Has Earned
         _;
@@ -50,35 +50,40 @@ abstract contract Staking {
         return s_balances[account];
     }
 
+    function getTotalRewards(address account) public view returns (uint256) {
+        return s_rewards[account];
+    }
+
     function earned(address account) public view returns (uint256) {
         uint256 currentBalance = s_balances[account];
         // how much they were paid already
         uint256 amountPaid = s_userRewardPerTokenPaid[account];
         uint256 currentRewardPerToken = rewardPerToken();
         uint256 pastRewards = s_rewards[account];
-        uint256 _earned = (currentBalance *
-            (currentRewardPerToken - amountPaid)) + pastRewards;
-
+        uint256 _earned = ((currentBalance * (currentRewardPerToken - amountPaid)) / 1e18) +
+            pastRewards;
         return _earned;
     }
 
     /** @dev Basis of how long it's been during the most recent snapshot/block */
-    function rewardPerToken() public view returns (uint256 newRewardPerToken) {
+    function rewardPerToken() public view returns (uint256) {
         if (s_totalSupply == 0) {
             return s_rewardPerTokenStored;
         } else {
             return
                 s_rewardPerTokenStored +
-                (((block.timestamp - s_lastUpdateTime) * rewardRate) /
-                    s_totalSupply / 1e18); //trying this
+                (((block.number  - s_lastUpdateTime) * rewardRate * 1e18) / s_totalSupply);
         }
     }
+
+
 
     // Write Functions
 
     function claimReward() public updateReward(msg.sender) {
-        uint256 reward = s_rewards[msg.sender];
-        bool success = s_unfiAddress.transfer(msg.sender, reward);
+        uint256 reward = s_rewards[msg.sender]; //This double spends
+        uint256 amountToSend = s_userRewardPerTokenPaid[account] - reward;
+        bool success = s_unfiAddress.transfer(msg.sender, amountToSend);
         if (!success) {
             revert Staking__TransferFailed();
         }
