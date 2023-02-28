@@ -29,6 +29,10 @@ contract UnifiProtocolVotingToken is
     mapping(address => uint256) public rewards;
     mapping(address => uint256) public amountUserStaked;
 
+    event Staked(address indexed user, uint256 amount);
+    event Withdrawn(address indexed user, uint256 amount);
+    event RewardPaid(address indexed user, uint256 reward);
+
     IERC20 public immutable unfiToken;
 
     constructor(address unfiTokenAddress)
@@ -81,11 +85,11 @@ contract UnifiProtocolVotingToken is
         whenNotPaused
     {
         require(_amount > 0, "vUNFI: NO_UNFI_TO_STAKE");
-        unfiToken.approve(address(this), _amount);
         unfiToken.transferFrom(msg.sender, address(this), _amount);
         _mint(msg.sender, _amount);
         amountUserStaked[msg.sender] += _amount;
         totalStaked += _amount;
+        emit Staked(msg.sender, _amount);
     }
 
     function withdraw(uint256 _amount)
@@ -100,6 +104,7 @@ contract UnifiProtocolVotingToken is
         totalStaked -= _amount;
         unfiToken.transfer(msg.sender, _amount);
         //Needs Reentracy protection
+        emit Withdrawn(msg.sender, _amount);
     }
 
     function getReward()
@@ -113,6 +118,7 @@ contract UnifiProtocolVotingToken is
             rewards[msg.sender] = 0;
             unfiToken.transfer(msg.sender, reward);
         }
+        emit RewardPaid(msg.sender, _amount);
     }
 
     //Admin + DAO Functions
@@ -157,7 +163,7 @@ contract UnifiProtocolVotingToken is
     }
 
     function withdrawFunds() public onlyOwner {
-        address(msg.sender).call{value: address(this).balance};
+        address(msg.sender).call{value: address(this).balance}("");
     }
 
     function withdrawFundsERC20(address tokenAddress) public onlyOwner {
@@ -195,5 +201,30 @@ contract UnifiProtocolVotingToken is
         override(ERC20, ERC20Votes)
     {
         super._burn(account, amount);
+    }
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) public override whenNotPaused returns (bool) {
+        if (recipient == address(this) || sender == address(this)) {
+            return super.transferFrom(sender, recipient, amount);
+        } else {
+            revert("vUNFI: TRANSFER_DISABLED");
+        }
+    }
+
+    function transfer(address recipient, uint256 amount)
+        public
+        override
+        whenNotPaused
+        returns (bool)
+    {
+        if (recipient == address(this) || sender == address(this)) {
+            return super.transferFrom(sender, recipient, amount);
+        } else {
+            revert("vUNFI: TRANSFER_DISABLED");
+        }
     }
 }
