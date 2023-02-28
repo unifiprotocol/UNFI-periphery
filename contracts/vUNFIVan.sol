@@ -96,17 +96,14 @@ contract UnifiProtocolVotingToken is
         totalStaked += _amount;
     }
 
-    function withdraw(uint256 _amount)
-        external
-        updateReward(msg.sender)
-        nonReentrant
-    {
+    function withdraw(uint256 _amount) external updateReward(msg.sender) {
         require(_amount > 0, "vUNFI: CANNOT_UNSTAKE_ZERO");
         getReward();
         _burn(msg.sender, _amount);
         amountUserStaked[msg.sender] -= _amount;
         totalStaked -= _amount;
         unfiToken.transfer(msg.sender, _amount);
+        //Needs Reentracy protection
     }
 
     function earned(address _account) public view returns (uint256) {
