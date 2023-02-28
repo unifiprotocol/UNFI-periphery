@@ -48,25 +48,7 @@ contract UnifiProtocolVotingToken is
         _;
     }
 
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
-    }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, amount);
-    }
+    //Read Functions
 
     function lastTimeRewardApplicable() public view returns (uint256) {
         return _min(finishAt, block.timestamp);
@@ -83,20 +65,34 @@ contract UnifiProtocolVotingToken is
             totalStaked;
     }
 
+    function earned(address _account) public view returns (uint256) {
+        return
+            ((amountUserStaked[_account] *
+                (rewardPerToken() - userRewardPerTokenPaid[_account])) / 1e18) +
+            rewards[_account];
+    }
+
+    // Write Functions
+
     function stake(uint256 _amount)
         external
         updateReward(msg.sender)
         nonReentrant
+        whenNotPaused
     {
         require(_amount > 0, "vUNFI: NO_UNFI_TO_STAKE");
-        unfiToken.transferFrom(msg.sender, address(this), _amount);
+        unfiToken.approve(address(this), _amount);
         unfiToken.transferFrom(msg.sender, address(this), _amount);
         _mint(msg.sender, _amount);
         amountUserStaked[msg.sender] += _amount;
         totalStaked += _amount;
     }
 
-    function withdraw(uint256 _amount) external updateReward(msg.sender) {
+    function withdraw(uint256 _amount)
+        external
+        updateReward(msg.sender)
+        whenNotPaused
+    {
         require(_amount > 0, "vUNFI: CANNOT_UNSTAKE_ZERO");
         getReward();
         _burn(msg.sender, _amount);
@@ -106,14 +102,12 @@ contract UnifiProtocolVotingToken is
         //Needs Reentracy protection
     }
 
-    function earned(address _account) public view returns (uint256) {
-        return
-            ((amountUserStaked[_account] *
-                (rewardPerToken() - userRewardPerTokenPaid[_account])) / 1e18) +
-            rewards[_account];
-    }
-
-    function getReward() public updateReward(msg.sender) nonReentrant {
+    function getReward()
+        public
+        updateReward(msg.sender)
+        nonReentrant
+        whenNotPaused
+    {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
@@ -121,24 +115,25 @@ contract UnifiProtocolVotingToken is
         }
     }
 
+    //Admin + DAO Functions
+
+    // @dev To update rewards, first set the duration in seconds to the setRewardsDuration.
+    // For example, 2592000 equals 30 days.
+    // Next, send an amount of UNFI to the contract using transfer.
+    // Lastly, call setRewardAmount with the _rewardRate. The rewardRate is the amount of wei of the token per second.
+    // For example, 3858024691358024 equals 10,000 UNFI per 30 days.
+    // This will begin the reward distribution. No rewards will be distributed until the setRewardAmount function is called.
+
     function setRewardsDuration(uint256 _duration) external onlyOwner {
         duration = _duration;
     }
 
-    function notifyRewardAmount(uint256 _amount)
+    function setRewardAmount(uint256 _rewardRate)
         external
         onlyOwner
         updateReward(address(0))
     {
-        // Perhaps this should be removed / adjusted v
-        if (block.timestamp >= finishAt) {
-            rewardRate = _amount / duration; //if starting from zero
-        } else {
-            uint256 remainingRewards = (finishAt - block.timestamp) *
-                rewardRate;
-            rewardRate = (_amount + remainingRewards) / duration;
-        }
-        //Perhaps this should be removed / adjusted ^
+        rewardRate = _rewardRate;
         finishAt = block.timestamp + duration;
         updatedAt = block.timestamp;
     }
@@ -147,15 +142,38 @@ contract UnifiProtocolVotingToken is
         return x <= y ? x : y;
     }
 
-    function updateRewardRate(uint256 _rewardRate)
-        public
-        onlyOwner
-        updateReward(msg.sender)
-    {
-        rewardRate = _rewardRate;
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+
+    // Emergency Functions
+
+    function mint(address to, uint256 amount) public onlyOwner {
+        _mint(to, amount);
+    }
+
+    function withdrawFunds() public onlyOwner {
+        address(msg.sender).call{value: address(this).balance};
+    }
+
+    function withdrawFundsERC20(address tokenAddress) public onlyOwner {
+        IERC20 token = IERC20(tokenAddress);
+        token.transfer(msg.sender, token.balanceOf(address(this)));
     }
 
     // The following functions are overrides required by Solidity.
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override whenNotPaused {
+        super._beforeTokenTransfer(from, to, amount);
+    }
 
     function _afterTokenTransfer(
         address from,
