@@ -22,7 +22,7 @@ contract UnifiProtocolVotingToken is
     uint256 public duration;
     uint256 public finishAt;
     uint256 public updatedAt;
-    uint256 public rewardRate;
+    uint256 public rewardRate = 3858024691358024;
     uint256 public rewardPerTokenStored;
     uint256 public totalStaked;
     mapping(address => uint256) public userRewardPerTokenPaid;
@@ -96,14 +96,17 @@ contract UnifiProtocolVotingToken is
         totalStaked += _amount;
     }
 
-    function withdraw(uint256 _amount) external updateReward(msg.sender) {
+    function withdraw(uint256 _amount)
+        external
+        updateReward(msg.sender)
+        nonReentrant
+    {
         require(_amount > 0, "vUNFI: CANNOT_UNSTAKE_ZERO");
         getReward();
         _burn(msg.sender, _amount);
         amountUserStaked[msg.sender] -= _amount;
         totalStaked -= _amount;
         unfiToken.transfer(msg.sender, _amount);
-        //Maybe add a check here, as reentrant guard is incompatible
     }
 
     function earned(address _account) public view returns (uint256) {
@@ -130,13 +133,15 @@ contract UnifiProtocolVotingToken is
         onlyOwner
         updateReward(address(0))
     {
+        // Perhaps this should be removed / adjusted v
         if (block.timestamp >= finishAt) {
-            rewardRate = _amount / duration;
+            rewardRate = _amount / duration; //if starting from zero
         } else {
             uint256 remainingRewards = (finishAt - block.timestamp) *
                 rewardRate;
             rewardRate = (_amount + remainingRewards) / duration;
         }
+        //Perhaps this should be removed / adjusted ^
         finishAt = block.timestamp + duration;
         updatedAt = block.timestamp;
     }
