@@ -35,9 +35,7 @@ contract UnifiProtocolVotingToken is
 
     IERC20 public immutable unfiToken;
 
-    constructor(
-        address unfiTokenAddress
-    )
+    constructor(address unfiTokenAddress)
         ERC20("Unifi Protocol Voting Token", "vUNFI")
         ERC20Permit("Unifi Protocol Voting Token")
     {
@@ -80,9 +78,12 @@ contract UnifiProtocolVotingToken is
 
     // Write Functions
 
-    function stake(
-        uint256 _amount
-    ) external updateReward(msg.sender) nonReentrant whenNotPaused {
+    function stake(uint256 _amount)
+        external
+        updateReward(msg.sender)
+        nonReentrant
+        whenNotPaused
+    {
         require(_amount > 0, "vUNFI: NO_UNFI_TO_STAKE");
         unfiToken.transferFrom(msg.sender, address(this), _amount);
         _mint(msg.sender, _amount);
@@ -91,9 +92,11 @@ contract UnifiProtocolVotingToken is
         emit Staked(msg.sender, _amount);
     }
 
-    function withdraw(
-        uint256 _amount
-    ) external updateReward(msg.sender) whenNotPaused {
+    function withdraw(uint256 _amount)
+        external
+        updateReward(msg.sender)
+        whenNotPaused
+    {
         require(_amount > 0, "vUNFI: CANNOT_UNSTAKE_ZERO");
         getReward();
         _burn(msg.sender, _amount);
@@ -115,7 +118,7 @@ contract UnifiProtocolVotingToken is
             rewards[msg.sender] = 0;
             unfiToken.transfer(msg.sender, reward);
         }
-        emit RewardPaid(msg.sender, _amount);
+        emit RewardPaid(msg.sender, reward);
     }
 
     //Admin + DAO Functions
@@ -131,9 +134,11 @@ contract UnifiProtocolVotingToken is
         duration = _duration;
     }
 
-    function setRewardAmount(
-        uint256 _rewardRate
-    ) external onlyOwner updateReward(address(0)) {
+    function setRewardAmount(uint256 _rewardRate)
+        external
+        onlyOwner
+        updateReward(address(0))
+    {
         rewardRate = _rewardRate;
         finishAt = block.timestamp + duration;
         updatedAt = block.timestamp;
@@ -187,17 +192,17 @@ contract UnifiProtocolVotingToken is
         super._afterTokenTransfer(from, to, amount);
     }
 
-    function _mint(
-        address to,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    function _mint(address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
         super._mint(to, amount);
     }
 
-    function _burn(
-        address account,
-        uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    function _burn(address account, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
         super._burn(account, amount);
     }
 
@@ -219,6 +224,7 @@ contract UnifiProtocolVotingToken is
         whenNotPaused
         returns (bool)
     {
+        address sender = _msgSender();
         if (recipient == address(this) || sender == address(this)) {
             return super.transferFrom(sender, recipient, amount);
         } else {
