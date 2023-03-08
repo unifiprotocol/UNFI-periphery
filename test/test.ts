@@ -8,12 +8,13 @@ describe("UnifiProtocolVotingToken", () => {
   let owner: Signer;
   let user1: Signer;
   let user2: Signer;
+  let user3: Signer;
 
   let unifiToken: UNFI;
   let votingToken: UnifiProtocolVotingToken;
 
   beforeEach(async () => {
-    [owner, user1, user2] = await ethers.getSigners();
+    [owner, user1, user2, user3] = await ethers.getSigners();
 
     unifiToken = await (
       await ethers.getContractFactory("UNFI")
@@ -275,6 +276,71 @@ describe("UnifiProtocolVotingToken", () => {
       // check total staked amount
       expect(await votingToken.totalStaked()).to.equal(
         ethers.utils.parseEther("150")
+      );
+    });
+  });
+
+  describe("delegating", () => {
+    it("should allow users to delegate their voting power to another user, then delegate to a different user", async () => {
+      const user1Address = await user1.getAddress();
+      const user2Address = await user2.getAddress();
+      const user3Address = await user3.getAddress();
+
+      // user1 stakes 50 UNFI tokens
+      await unifiToken
+        .connect(user1)
+        .approve(votingToken.address, ethers.utils.parseEther("50"));
+      await votingToken.connect(user1).stake(ethers.utils.parseEther("50"));
+
+      // user2 stakes 100 UNFI tokens
+      await unifiToken
+        .connect(user2)
+        .approve(votingToken.address, ethers.utils.parseEther("100"));
+      await votingToken.connect(user2).stake(ethers.utils.parseEther("100"));
+
+      // user1 delegates their voting power to user2
+      await votingToken.connect(user1).delegate(user2Address);
+
+      // check user balances
+      expect(await votingToken.balanceOf(user1Address)).to.equal(
+        ethers.utils.parseEther("50")
+      );
+      expect(await votingToken.balanceOf(user2Address)).to.equal(
+        ethers.utils.parseEther("100")
+      );
+
+      // check total staked amount
+      expect(await votingToken.totalStaked()).to.equal(
+        ethers.utils.parseEther("150")
+      );
+
+      // check user1's delegated amount
+      expect(await votingToken.getVotes(user2Address)).to.equal(
+        ethers.utils.parseEther("50")
+      );
+
+      // check user1's delegatee
+      expect(await votingToken.delegates(user1Address)).to.equal(user2Address);
+
+      // check user2's delegatee
+      expect(await votingToken.delegates(user2Address)).to.equal(
+        ethers.constants.AddressZero
+      );
+
+      // user1 undelegates their voting power
+      expect(await votingToken.connect(user1).delegate(user3Address));
+
+      // check user1's delegatee again
+      expect(await votingToken.delegates(user1Address)).to.equal(user3Address);
+
+      // check user2's delegated amount
+      expect(await votingToken.getVotes(user2Address)).to.equal(
+        ethers.utils.parseEther("0")
+      );
+
+      // check user3's delegated amount
+      expect(await votingToken.getVotes(user3Address)).to.equal(
+        ethers.utils.parseEther("50")
       );
     });
   });

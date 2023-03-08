@@ -54,10 +54,12 @@ contract UnifiProtocolVotingToken is
 
     //Read Functions
 
+    ///@notice Returns the last time rewards were applicable. This is the minimum of the finishAt and the current block timestamp.
     function lastTimeRewardApplicable() public view returns (uint256) {
         return _min(finishAt, block.timestamp);
     }
 
+    ///@notice Returns the reward per token. This is the reward per token stored plus the amount of wei of the token per second multiplied by the time since the last update.
     function rewardPerToken() public view returns (uint256) {
         if (totalStaked == 0) {
             return rewardPerTokenStored;
@@ -69,6 +71,8 @@ contract UnifiProtocolVotingToken is
             totalStaked;
     }
 
+    ///@notice Returns the amount of wei of the token that the user has earned.
+    ///@param _account The address of the user.
     function earned(address _account) public view returns (uint256) {
         return
             ((amountUserStaked[_account] *
@@ -78,6 +82,8 @@ contract UnifiProtocolVotingToken is
 
     // Write Functions
 
+    ///@notice Stakes UNFI tokens. The user must first approve the contract to transfer UNFI tokens on their behalf.
+    ///@param _amount The amount of UNFI tokens to stake.
     function stake(uint256 _amount)
         external
         updateReward(msg.sender)
@@ -92,6 +98,8 @@ contract UnifiProtocolVotingToken is
         emit Staked(msg.sender, _amount);
     }
 
+    ///@notice Withdraws UNFI tokens. The user must first approve the contract to transfer UNFI tokens on their behalf.
+    ///@param _amount The amount of UNFI tokens to withdraw.
     function withdraw(uint256 _amount)
         external
         updateReward(msg.sender)
@@ -107,6 +115,7 @@ contract UnifiProtocolVotingToken is
         emit Withdrawn(msg.sender, _amount);
     }
 
+    ///@notice Claims rewards.
     function getReward()
         public
         updateReward(msg.sender)
@@ -130,9 +139,14 @@ contract UnifiProtocolVotingToken is
     // For example, 3858024691358024 equals 10,000 UNFI per 30 days.
     // This will begin the reward distribution. No rewards will be distributed until the setRewardAmount function is called.
 
+    ///@notice Sets the duration of the rewards.
+    ///@param _duration The duration of the rewards in seconds.
     function setRewardsDuration(uint256 _duration) external onlyOwner {
         duration = _duration;
     }
+
+    ///@notice Sets the reward amount.
+    ///@param _rewardRate The reward rate in wei of the token per second.
 
     function setRewardAmount(uint256 _rewardRate)
         external
@@ -144,24 +158,45 @@ contract UnifiProtocolVotingToken is
         updatedAt = block.timestamp;
     }
 
+    ///@notice Returns the remaining rewards.
+    function remainingRewards() external view returns (uint256) {
+        return unfiToken.balanceOf(address(this)) - totalStaked;
+    }
+
+    ///@notice Simply a helper function to calculate the minimum of two numbers.
+    ///@param x The first number.
+    ///@param y The second number.
     function _min(uint256 x, uint256 y) private pure returns (uint256) {
         return x <= y ? x : y;
     }
 
+    ///@notice Pauses the contract.
     function pause() public onlyOwner {
         _pause();
     }
 
+    ///@notice Unpauses the contract.
     function unpause() public onlyOwner {
         _unpause();
     }
 
     // Emergency Functions
 
+    ///@notice Emergency function to mint vUNFI tokens. Only callable by the owner.
+    ///@param to The address to mint the tokens to.
+    ///@param amount The amount of tokens to mint.
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
 
+    ///@notice Emergency function to burn vUNFI tokens. Only callable by the owner.
+    ///@param from The address to burn the tokens from.
+    ///@param amount The amount of tokens to burn.
+    function burn(address from, uint256 amount) public onlyOwner {
+        _burn(from, amount);
+    }
+
+    ///@notice Emergency function to withdraw ETH from the contract. Only callable by the owner.
     function withdrawFunds() public onlyOwner {
         (bool sent, ) = address(msg.sender).call{value: address(this).balance}(
             ""
@@ -169,6 +204,8 @@ contract UnifiProtocolVotingToken is
         require(sent, "Failed to send Ether");
     }
 
+    ///@notice Emergency function to withdraw ERC20 tokens from the contract. Only callable by the owner.
+    ///@param tokenAddress The address of the ERC20 token.
     function withdrawFundsERC20(address tokenAddress) public onlyOwner {
         IERC20 token = IERC20(tokenAddress);
         token.transfer(msg.sender, token.balanceOf(address(this)));
