@@ -5,27 +5,21 @@ import "@openzeppelin/contracts/governance/Governor.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 
 contract UnifiGovernor is
     Governor,
     GovernorSettings,
     GovernorCountingSimple,
-    GovernorVotes,
-    GovernorTimelockControl
+    GovernorVotes
 {
-    ///@notice The proposal threshold is 50,000 UNFI, which is equivalent to 0.5% of the total supply.
     constructor(
-        IVotes _token,
-        TimelockController _timelock
+        IVotes _token
     )
         Governor("UnifiGovernor")
-        GovernorSettings(1 /* 1 block */, 50400 /* 1 week */, 50000e18)
+        GovernorSettings(10 /* 10 block */, 50400 /* 1 week */, 50000e18)
         GovernorVotes(_token)
-        GovernorTimelockControl(_timelock)
     {}
 
-    ///@notice The quorum threshold is 250,000 UNFI, which is equivalent to 2.5% of the total supply.
     function quorum(
         uint256 blockNumber
     ) public pure override returns (uint256) {
@@ -52,26 +46,6 @@ contract UnifiGovernor is
         return super.votingPeriod();
     }
 
-    function state(
-        uint256 proposalId
-    )
-        public
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (ProposalState)
-    {
-        return super.state(proposalId);
-    }
-
-    function propose(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        string memory description
-    ) public override(Governor, IGovernor) returns (uint256) {
-        return super.propose(targets, values, calldatas, description);
-    }
-
     function proposalThreshold()
         public
         view
@@ -79,39 +53,5 @@ contract UnifiGovernor is
         returns (uint256)
     {
         return super.proposalThreshold();
-    }
-
-    function _execute(
-        uint256 proposalId,
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) {
-        super._execute(proposalId, targets, values, calldatas, descriptionHash);
-    }
-
-    function _cancel(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
-        bytes32 descriptionHash
-    ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
-        return super._cancel(targets, values, calldatas, descriptionHash);
-    }
-
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (address)
-    {
-        return super._executor();
-    }
-
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(Governor, GovernorTimelockControl) returns (bool) {
-        return super.supportsInterface(interfaceId);
     }
 }

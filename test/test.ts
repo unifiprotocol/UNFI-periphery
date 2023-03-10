@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { Contract, Signer } from "ethers";
 import { UnifiProtocolVotingToken } from "../typechain-types/contracts/vUNFIVan.sol";
 import { UNFI } from "../typechain-types/contracts/UNFI";
+import { UnifiGovernor } from "../typechain-types/contracts/vUNFIGovernor.sol";
 
 describe("UnifiProtocolVotingToken", () => {
   let owner: Signer;
@@ -12,6 +13,7 @@ describe("UnifiProtocolVotingToken", () => {
 
   let unifiToken: UNFI;
   let votingToken: UnifiProtocolVotingToken;
+  let governor: UnifiGovernor;
 
   beforeEach(async () => {
     [owner, user1, user2, user3] = await ethers.getSigners();
@@ -24,6 +26,11 @@ describe("UnifiProtocolVotingToken", () => {
     votingToken = await (
       await ethers.getContractFactory("UnifiProtocolVotingToken")
     ).deploy(unifiToken.address);
+
+    // //deploy vUNFIGovernor contract
+    // governor = await (
+    //   await ethers.getContractFactory("UNFIGovernor")
+    // ).deploy(votingToken.address, 1231242421412);
 
     //mint unfi tokens to the users for testing
     await unifiToken.mint(
