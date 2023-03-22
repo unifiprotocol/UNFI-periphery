@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+# Unifi Governance Smart Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+These smart contracts have been designed to facilitate the operation and governance of a Unifi Protocol DAO. They enable token holders to participate in the decision-making process by voting on proposals and staking their tokens to earn rewards. The contracts also provide a mechanism for managing the distribution of rewards and for enforcing time-based locks on certain actions. Overall, these contracts aim to increase the transparency and accountability of the DAO by ensuring that the decision-making process is fair and democratic.
 
-Try running some of the following tasks:
+## Smart Contracts
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+### UnifiGovernor.sol
+
+The UnifiGovernor contract is responsible for managing proposals and voting in the Unifi protocol. It is based on the OpenZeppelin Governor contract and includes additional features such as a quorum and timelock control.
+
+### UnifiProtocolVotingToken.sol
+
+The UnifiProtocolVotingToken contract is the ERC20 token used for voting in the Unifi protocol. It is based on the OpenZeppelin ERC20 contract and includes additional features such as a burn function and a maximum supply cap.
+
+### UnifiStaking.sol
+
+The UnifiStaking contract is responsible for staking UNFI tokens and earning rewards in the Unifi protocol. It is based on the OpenZeppelin Ownable2Step, Pausable, and ReentrancyGuard contracts and includes additional features such as reward rate management and wrapped token minting.
+
+## License
+
+These smart contracts are licensed under the MIT License. See the LICENSE file for more information.
