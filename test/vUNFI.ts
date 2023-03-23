@@ -121,4 +121,29 @@ describe("vUNFI", () => {
       ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrDelegated");
     });
   });
+
+  describe("delegating", () => {
+    it("should allow users to delegate their voting power to another user, then delegate to a different user", async () => {
+      const ownerAddr = await owner.getAddress();
+      const user1Address = await user1.getAddress();
+
+      await votingToken.mint(user1Address, ethers.utils.parseEther("100"));
+      await votingToken.connect(user1).delegate(ownerAddr);
+      expect(await votingToken.getVotes(ownerAddr)).to.equal(
+        ethers.utils.parseEther("100")
+      );
+      expect(await votingToken.delegates(user1Address)).to.equal(ownerAddr);
+      expect(await votingToken.delegates(ownerAddr)).to.equal(
+        ethers.constants.AddressZero
+      );
+      expect(await votingToken.connect(user1).delegate(user1Address));
+      expect(await votingToken.delegates(user1Address)).to.equal(user1Address);
+      expect(await votingToken.getVotes(ownerAddr)).to.equal(
+        ethers.utils.parseEther("0")
+      );
+      expect(await votingToken.getVotes(user1Address)).to.equal(
+        ethers.utils.parseEther("100")
+      );
+    });
+  });
 });
