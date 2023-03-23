@@ -33,7 +33,7 @@ describe("vUNFIStaking", () => {
       .getContractFactory("UnifiStaking")
       .then((factory) => factory.deploy(token0.address, govUnfi.address));
 
-    await govUnfi.setDelegated(staking.address);
+    await govUnfi.setController(staking.address);
 
     //mint unfi tokens to the users for testing
     await token0.mint(

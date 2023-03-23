@@ -16,46 +16,46 @@ contract UnifiProtocolVotingToken is
     Ownable2Step
 {
     /// @notice this role has rights for transfer/mint/burning tokens, such us a staking contract
-    address private _delegated = address(0);
+    address private _controller = address(0);
 
-    event DelegatedUpdated(address newDelegated);
+    event ControllerUpdated(address newController);
 
     constructor()
         ERC20("Unifi Protocol Voting Token", "vUNFI")
         ERC20Permit("Unifi Protocol Voting Token")
     {}
 
-    modifier onlyOwnerOrDelegated() {
+    modifier onlyOwnerOrController() {
         require(
-            msg.sender == owner() || msg.sender == _delegated,
-            "UnifiProtocolVotingToken: onlyOwnerOrDelegated"
+            msg.sender == owner() || msg.sender == _controller,
+            "UnifiProtocolVotingToken: onlyOwnerOrController"
         );
         _;
     }
 
-    /// @notice Function to mint vUNFI tokens. Only callable by the owner & delegated.
+    /// @notice Function to mint vUNFI tokens. Only callable by the owner & controller.
     /// @param to The address to mint the tokens to.
     /// @param amount The amount of tokens to mint.
-    function mint(address to, uint256 amount) public onlyOwnerOrDelegated {
+    function mint(address to, uint256 amount) public onlyOwnerOrController {
         _mint(to, amount);
     }
 
-    ///@notice Function to burn vUNFI tokens. Only callable by the owner & delegated.
+    ///@notice Function to burn vUNFI tokens. Only callable by the owner & controller.
     /// @param from The address to burn the tokens from.
     /// @param amount The amount of tokens to burn.
-    function burn(address from, uint256 amount) public onlyOwnerOrDelegated {
+    function burn(address from, uint256 amount) public onlyOwnerOrController {
         _burn(from, amount);
     }
 
-    /// @notice Set a new delegated address.
-    /// @param newDelegated The new delegated address.
-    function setDelegated(address newDelegated) public onlyOwner {
-        _delegated = newDelegated;
-        emit DelegatedUpdated(newDelegated);
+    /// @notice Set a new controller address.
+    /// @param newController The new controller address.
+    function setController(address newController) public onlyOwner {
+        _controller = newController;
+        emit ControllerUpdated(newController);
     }
 
-    function delegated() public view returns (address) {
-        return _delegated;
+    function controller() public view returns (address) {
+        return _controller;
     }
 
     // The following functions are overrides required by Solidity.
@@ -93,14 +93,14 @@ contract UnifiProtocolVotingToken is
         address sender,
         address recipient,
         uint256 amount
-    ) public override onlyOwnerOrDelegated returns (bool) {
+    ) public override onlyOwnerOrController returns (bool) {
         return super.transferFrom(sender, recipient, amount);
     }
 
     function transfer(
         address recipient,
         uint256 amount
-    ) public override onlyOwnerOrDelegated returns (bool) {
+    ) public override onlyOwnerOrController returns (bool) {
         return super.transfer(recipient, amount);
     }
 }

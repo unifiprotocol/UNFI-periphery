@@ -41,15 +41,15 @@ describe("vUNFI", () => {
   });
 
   describe("Access Control", function () {
-    it("Should allow the owner to grant the DELEGATED_ROLE", async () => {
-      await votingToken.setDelegated(await user1.getAddress());
-      expect(await votingToken.delegated()).to.be.equal(
+    it("Should allow the owner to grant the CONTROLLER role", async () => {
+      await votingToken.setController(await user1.getAddress());
+      expect(await votingToken.controller()).to.be.equal(
         await user1.getAddress()
       );
     });
 
-    it("Should allow to DELEGATED_ROLE to mint and burn tokens", async () => {
-      await votingToken.setDelegated(await user1.getAddress());
+    it("Should allow to CONTROLLER role to mint and burn tokens", async () => {
+      await votingToken.setController(await user1.getAddress());
       const votingTokenAsUser1 = votingToken.connect(user1);
       await votingTokenAsUser1.mint(await user1.getAddress(), 100);
       expect(await votingToken.balanceOf(await user1.getAddress())).to.equal(
@@ -63,8 +63,8 @@ describe("vUNFI", () => {
       expect(await votingToken.balanceOf(await user1.getAddress())).to.equal(0);
     });
 
-    it("Should allow to DELEGATED_ROLE to transfer tokens #0", async () => {
-      await votingToken.setDelegated(stakingContract.address);
+    it("Should allow to CONTROLLER role to transfer tokens #0", async () => {
+      await votingToken.setController(stakingContract.address);
       await baseToken.approve(stakingContract.address, 100);
       await stakingContract.stake(100);
       expect(await votingToken.balanceOf(await owner.getAddress())).to.equal(
@@ -72,8 +72,8 @@ describe("vUNFI", () => {
       );
     });
 
-    it("Should allow to DELEGATED_ROLE to transfer using transferFrom tokens #1", async () => {
-      await votingToken.setDelegated(await user1.getAddress());
+    it("Should allow to CONTROLLER role to transfer using transferFrom tokens #1", async () => {
+      await votingToken.setController(await user1.getAddress());
       const votingTokenAsUser1 = votingToken.connect(user1);
       await votingTokenAsUser1.mint(await user1.getAddress(), 100);
       await votingTokenAsUser1.approve(await user1.getAddress(), 100);
@@ -88,37 +88,37 @@ describe("vUNFI", () => {
       expect(await votingToken.balanceOf(await user1.getAddress())).to.equal(0);
     });
 
-    it("Should prevent to transfer tokens because the user doesn't have DELEGATED_ROLE", async () => {
+    it("Should prevent to transfer tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       await votingToken.mint(await user1.getAddress(), 100);
       await expect(
         votingTokenAsUser1.transfer(await owner.getAddress(), 100)
-      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrDelegated");
+      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrController");
     });
 
-    it("Should prevent to mint tokens because the user doesn't have DELEGATED_ROLE", async () => {
+    it("Should prevent to mint tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       await expect(
         votingTokenAsUser1.mint(await user1.getAddress(), 100)
-      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrDelegated");
+      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrController");
     });
 
-    it("Should prevent to burn tokens because the user doesn't have DELEGATED_ROLE", async () => {
+    it("Should prevent to burn tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       await expect(
         votingTokenAsUser1["burn(address,uint256)"](
           await owner.getAddress(),
           100
         )
-      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrDelegated");
+      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrController");
     });
 
-    it("Should prevent to transferFrom tokens because the user doesn't have DELEGATED_ROLE", async () => {
+    it("Should prevent to transferFrom tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       const ownerAddr = await owner.getAddress();
       await expect(
         votingTokenAsUser1.transferFrom(ownerAddr, ownerAddr, 100)
-      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrDelegated");
+      ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrController");
     });
   });
 
