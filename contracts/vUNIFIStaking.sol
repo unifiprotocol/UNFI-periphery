@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./vUNFI.sol";
+import "./vUNIFI.sol";
 
 contract UnifiStaking is Ownable2Step, Pausable, ReentrancyGuard {
     IERC20 public immutable token;

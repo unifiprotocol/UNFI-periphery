@@ -21,7 +21,7 @@ contract UnifiProtocolVotingToken is
     event ControllerUpdated(address newController);
 
     constructor()
-        ERC20("Unifi Protocol Voting Token", "vUNFI")
+        ERC20("Unifi Protocol Voting Token", "vUNIFI")
         ERC20Permit("Unifi Protocol Voting Token")
     {}
 
@@ -33,14 +33,14 @@ contract UnifiProtocolVotingToken is
         _;
     }
 
-    /// @notice Function to mint vUNFI tokens. Only callable by the owner & controller.
+    /// @notice Function to mint vUNIFI tokens. Only callable by the owner & controller.
     /// @param to The address to mint the tokens to.
     /// @param amount The amount of tokens to mint.
     function mint(address to, uint256 amount) public onlyOwnerOrController {
         _mint(to, amount);
     }
 
-    ///@notice Function to burn vUNFI tokens. Only callable by the owner & controller.
+    ///@notice Function to burn vUNIFI tokens. Only callable by the owner & controller.
     /// @param from The address to burn the tokens from.
     /// @param amount The amount of tokens to burn.
     function burn(address from, uint256 amount) public onlyOwnerOrController {

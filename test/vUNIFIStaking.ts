@@ -5,9 +5,9 @@ import {
   UnifiProtocolVotingToken,
   SampleERC20,
   UnifiStaking,
-} from "../typechain";
+} from "../typechain-types";
 
-describe("vUNFIStaking", () => {
+describe("vUNIFIStaking", () => {
   let owner: Signer;
   let user1: Signer;
   let user2: Signer;

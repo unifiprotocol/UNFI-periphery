@@ -1,10 +1,14 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { constants } from "ethers";
-import { SampleERC20, TimelockController, UnifiGovernor } from "../typechain";
+import {
+  SampleERC20,
+  TimelockController,
+  UnifiGovernor,
+} from "../typechain-types";
 
-describe("vUNFIGovernor", function () {
-  let vUNFIGovernor: UnifiGovernor;
+describe("vUNIFIGovernor", function () {
+  let vUNIFIGovernor: UnifiGovernor;
   let token: SampleERC20;
   let timeLock: TimelockController;
 
@@ -24,39 +28,39 @@ describe("vUNFIGovernor", function () {
       addr0.address
     );
 
-    const vUNFIGovernorFactory = await ethers.getContractFactory(
+    const vUNIFIGovernorFactory = await ethers.getContractFactory(
       "UnifiGovernor"
     );
-    vUNFIGovernor = await vUNFIGovernorFactory
+    vUNIFIGovernor = await vUNIFIGovernorFactory
       .deploy(token.address, timeLock.address)
       .then((x) => x.deployed());
 
     await timeLock.grantRole(
       await timeLock.PROPOSER_ROLE(),
-      vUNFIGovernor.address
+      vUNIFIGovernor.address
     );
   });
 
   describe("constructor", function () {
     it('Should match the "token" address', async function () {
-      expect(await vUNFIGovernor.token()).to.equal(token.address);
+      expect(await vUNIFIGovernor.token()).to.equal(token.address);
     });
 
     it('Should match the "timelock" address', async function () {
-      const contractTimelock = await vUNFIGovernor.timelock();
+      const contractTimelock = await vUNIFIGovernor.timelock();
       expect(contractTimelock).to.equal(timeLock.address);
     });
   });
 
   describe("vars", function () {
     it("Should fail trying to update quorum because not enough permissions", async function () {
-      await expect(vUNFIGovernor.setQuorum(40000000)).revertedWith(
+      await expect(vUNIFIGovernor.setQuorum(40000000)).revertedWith(
         "Governor: onlyGovernance"
       );
     });
 
     it("Should fail trying to update proposalThreshold because not enough permissions", async function () {
-      await expect(vUNFIGovernor.setProposalThreshold(10000000)).revertedWith(
+      await expect(vUNIFIGovernor.setProposalThreshold(10000000)).revertedWith(
         "Governor: onlyGovernance"
       );
     });

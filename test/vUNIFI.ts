@@ -5,9 +5,9 @@ import {
   SampleERC20,
   UnifiProtocolVotingToken,
   UnifiStaking,
-} from "../typechain";
+} from "../typechain-types";
 
-describe("vUNFI", () => {
+describe("vUNIFI", () => {
   let owner: Signer;
   let user1: Signer;
 
@@ -36,7 +36,7 @@ describe("vUNFI", () => {
   describe("constructor", () => {
     it("should set the correct name and symbol", async () => {
       expect(await votingToken.name()).to.equal("Unifi Protocol Voting Token");
-      expect(await votingToken.symbol()).to.equal("vUNFI");
+      expect(await votingToken.symbol()).to.equal("vUNIFI");
     });
   });
 
