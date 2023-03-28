@@ -17,8 +17,10 @@ contract UnifiProtocolVotingToken is
 {
     /// @notice this role has rights for transfer/mint/burning tokens, such us a staking contract
     address private _controller = address(0);
+    mapping(address => bool) _blacklist;
 
     event ControllerUpdated(address newController);
+    event BlacklistUpdated(address indexed user, bool value);
 
     constructor()
         ERC20("Unifi Protocol Voting Token", "vUNIFI")
@@ -37,6 +39,7 @@ contract UnifiProtocolVotingToken is
     /// @param to The address to mint the tokens to.
     /// @param amount The amount of tokens to mint.
     function mint(address to, uint256 amount) public onlyOwnerOrController {
+        require(!isBlackListed(to), "UnifiProtocolVotingToken: Blacklisted");
         _mint(to, amount);
     }
 
@@ -54,8 +57,27 @@ contract UnifiProtocolVotingToken is
         emit ControllerUpdated(newController);
     }
 
+    /// @notice Get the current controller address.
     function controller() public view returns (address) {
         return _controller;
+    }
+
+    /// @notice Function to blacklist an address. Only callable by the owner.
+    /// @param user The address to blacklist.
+    /// @param value The blacklist value. True to blacklist an address, false to remove an address from the blacklist.
+    function blacklistUpdate(
+        address user,
+        bool value
+    ) public virtual onlyOwnerOrController {
+        _blacklist[user] = value;
+        emit BlacklistUpdated(user, value);
+    }
+
+    /// @notice Function to check if an address is blacklisted.
+    /// @param user The address to check.
+
+    function isBlackListed(address user) public view returns (bool) {
+        return _blacklist[user];
     }
 
     // The following functions are overrides required by Solidity.
