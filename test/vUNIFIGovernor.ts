@@ -19,7 +19,7 @@ describe("vUNIFIGovernor", function () {
     token = await Token.deploy("UNFI", "Unifi Protocol DAO", 1000000000);
 
     const TimelockController = await ethers.getContractFactory(
-      "TimelockController"
+      "@openzeppelin/contracts/governance/TimelockController.sol:TimelockController"
     );
     timeLock = await TimelockController.deploy(
       5,
