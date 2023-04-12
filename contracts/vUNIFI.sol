@@ -8,13 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-contract UnifiProtocolVotingToken is
-    ERC20,
-    ERC20Burnable,
-    ERC20Permit,
-    ERC20Votes,
-    Ownable2Step
-{
+contract UnifiProtocolVotingToken is ERC20Burnable, ERC20Votes, Ownable2Step {
     /// @notice this role has rights for transfer/mint/burning tokens, such us a staking contract
     address private _controller = address(0);
     mapping(address => bool) _blacklist;
