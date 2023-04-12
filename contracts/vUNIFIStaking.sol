@@ -26,7 +26,7 @@ contract UnifiStaking is Ownable2Step, Pausable, ReentrancyGuard {
     event RewardPaid(address indexed user, uint256 reward);
 
     constructor(address baseToken, address wrapped) {
-        token = UnifiProtocolVotingToken(baseToken);
+        token = IERC20(baseToken);
         wrappedToken = UnifiProtocolVotingToken(wrapped);
     }
 
