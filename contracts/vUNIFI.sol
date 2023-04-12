@@ -37,11 +37,17 @@ contract UnifiProtocolVotingToken is ERC20Burnable, ERC20Votes, Ownable2Step {
         _mint(to, amount);
     }
 
-    ///@notice Function to burn vUNIFI tokens. Only callable by the owner & controller.
+    /// @notice Function to burn vUNIFI tokens.
     /// @param from The address to burn the tokens from.
     /// @param amount The amount of tokens to burn.
-    function burn(address from, uint256 amount) public onlyOwnerOrController {
+    function burnFrom(address from, uint256 amount) public override {
         _burn(from, amount);
+    }
+
+    /// @notice Function to burn vUNIFI tokens.
+    /// @param amount The amount of tokens to burn.
+    function burn(uint256 amount) public override {
+        _burn(msg.sender, amount);
     }
 
     /// @notice Set a new controller address.
@@ -62,7 +68,7 @@ contract UnifiProtocolVotingToken is ERC20Burnable, ERC20Votes, Ownable2Step {
     function blacklistUpdate(
         address user,
         bool value
-    ) public virtual onlyOwnerOrController {
+    ) public virtual onlyOwner {
         _blacklist[user] = value;
         emit BlacklistUpdated(user, value);
     }
@@ -101,7 +107,7 @@ contract UnifiProtocolVotingToken is ERC20Burnable, ERC20Votes, Ownable2Step {
     function _burn(
         address account,
         uint256 amount
-    ) internal override(ERC20, ERC20Votes) {
+    ) internal override(ERC20, ERC20Votes) onlyOwnerOrController {
         super._burn(account, amount);
     }
 

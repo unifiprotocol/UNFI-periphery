@@ -56,7 +56,7 @@ describe("vUNIFI", () => {
         100
       );
 
-      await votingTokenAsUser1["burn(address,uint256)"](
+      await votingTokenAsUser1["burnFrom(address,uint256)"](
         await user1.getAddress(),
         100
       );
@@ -96,6 +96,13 @@ describe("vUNIFI", () => {
       ).to.be.revertedWith("UnifiProtocolVotingToken: onlyOwnerOrController");
     });
 
+    it("Should prevent to burn tokens because the user doesn't have CONTROLLER role", async () => {
+      const votingTokenAsUser1 = votingToken.connect(user1);
+      await expect(votingTokenAsUser1.burn(100)).to.be.revertedWith(
+        "UnifiProtocolVotingToken: onlyOwnerOrController"
+      );
+    });
+
     it("Should prevent to mint tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       await expect(
@@ -106,7 +113,7 @@ describe("vUNIFI", () => {
     it("Should prevent to burn tokens because the user doesn't have CONTROLLER role", async () => {
       const votingTokenAsUser1 = votingToken.connect(user1);
       await expect(
-        votingTokenAsUser1["burn(address,uint256)"](
+        votingTokenAsUser1["burnFrom(address,uint256)"](
           await owner.getAddress(),
           100
         )

@@ -129,7 +129,7 @@ contract UnifiStaking is Ownable2Step, Pausable, ReentrancyGuard {
     /// @param account The address to burn the wrapped token from.
     /// @param amount The amount of wrapped token to burn.
     function _burn(address account, uint256 amount) internal {
-        wrappedToken.burn(account, amount);
+        wrappedToken.burnFrom(account, amount);
     }
 
     // READ FUNCTIONS
