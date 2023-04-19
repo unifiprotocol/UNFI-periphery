@@ -18,7 +18,7 @@ Note this token is not transferrable.
 
 The UnifiStaking contract is responsible for staking UNFI tokens and earning rewards in the Unifi protocol. It is based on the OpenZeppelin Ownable2Step, Pausable, and ReentrancyGuard contracts and includes additional features such as reward rate management and wrapped token minting.
 
-## TimeLockController.sol
+### vTimeLockController.sol
 
 The Time Lock Controller is responsible for delaying governance calls until after the set amount of time has passed. This allows UNFI token holders to take action before a proposal is implamented. In addition, this allows for a final 'gut check' in the event the proposal would negatively impact the ecosystem.
 
