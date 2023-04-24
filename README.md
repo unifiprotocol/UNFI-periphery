@@ -4,6 +4,14 @@ These smart contracts have been designed to facilitate the operation and governa
 
 ## Smart Contracts
 
+| Contract Name            | Address                                    | #                                                                            |
+|--------------------------|--------------------------------------------|------------------------------------------------------------------------------|
+| UnifiProtocolVotingToken | 0x6b5e07063B3cd19BEF0d9e9F66d22dB5D517f52a | [🔍](https://etherscan.io/address/0x6b5e07063B3cd19BEF0d9e9F66d22dB5D517f52a)      |
+| UnifiStaking             | 0x90817bCcafAb6D5be9E0198252Ba70C542a91bac | [🔍](https://etherscan.io/address/0x90817bCcafAb6D5be9E0198252Ba70C542a91bac#code) |
+| vTimeLockController      | 0xD8E3c7AcB8c9337B5CEeeC2539a81297B9d5AD96 | [🔍](https://etherscan.io/address/0xD8E3c7AcB8c9337B5CEeeC2539a81297B9d5AD96#code) |
+| UnifiGovernor            | 0x96618A5F91720f61FfBA80Fd1CE2822F4f4Ba634 | [🔍](https://etherscan.io/address/0x96618a5f91720f61ffba80fd1ce2822f4f4ba634#code) |
+| UNIFI                    | 0x441761326490cacf7af299725b6292597ee822c2 | [🔍](https://etherscan.io/address/0x441761326490cacf7af299725b6292597ee822c2#code) |
+
 ### UnifiGovernor.sol
 
 The UnifiGovernor contract is responsible for managing proposals and voting in the Unifi protocol. It is based on the OpenZeppelin Governor contract and includes additional features such as a quorum and timelock control.
