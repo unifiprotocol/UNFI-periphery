@@ -2,10 +2,30 @@
 
 These smart contracts have been designed to facilitate the operation and governance of a Unifi Protocol DAO. They enable token holders to participate in the decision-making process by voting on proposals and staking their tokens to earn rewards. The contracts also provide a mechanism for managing the distribution of rewards and for enforcing time-based locks on certain actions. Overall, these contracts aim to increase the transparency and accountability of the DAO by ensuring that the decision-making process is fair and democratic.
 
+## How Does This Work?
+
+### Staking
+
+Staking rewards users for participating in the DAO ecosystem. Initially, 10,000 UNFI will be distributed every 30 days from the Unifi Protocol DAO Treasury. The APR will be determined by the total amount of UNFI staked. There is no cap on how much UNFI can be staked. In the future, the DAO can choose to increase, decrease, or completely remove this incentive.
+
+### Governance
+
+The original UNFI token contract does not contain the proper implementations for voting. Fortunately, the staking contract allows us to wrap the original UNFI token to a token that does contain voting rights. When you stake UNFI, you will receive vUNIFI - a non-transferable ERC-20 token compatible with the OpenZeppelin Governance standard. vUNIFI serves a receipt for your staked UNFI, redeemable at any time for the original staked UNFI plus UNFI staking rewards.
+
+For Governance, Unifi Protocol will utilize Tally.xyz for on-chain governance, and Snapshot.org for off-chain polling, known as ‘temperature checks’. vUNIFI must be delegated on Tally.xyz in order to participate in on-chain governance. Users can delegate their votes to themselves, or a representative to vote on their behalf. Anybody can be a representative.
+
+### Referendums
+
+![Referendum Timeline](/public/proposal.jpg "Referendum Timeline")
+
+In order for a referendum to be considered valid, the proposal must pass a temperature check on Snapshot.org, then pass with 50% + 1 approval on Tally.xyz. A proposal must be submitted by a representative with a delegation of at least 50,000 vUNIFI (0.5% of Total Supply), and must reach a quorum of 250,000 vUNIFI (2.5% of total supply). The on-chain proposal will need to submit calldata to implement the proposal.
+
+Once a proposal is passed, the referendum is queued to be executed. A waiting period of 7 days is enforced using OpenZeppelin’s Timelock Controller. This allows users to take action before the implantation of the referendum.
+
 ## Smart Contracts
 
-| Contract Name            | Address                                    | #                                                                            |
-|--------------------------|--------------------------------------------|------------------------------------------------------------------------------|
+| Contract Name            | Address                                    | #                                                                                  |
+| ------------------------ | ------------------------------------------ | ---------------------------------------------------------------------------------- |
 | UnifiProtocolVotingToken | 0x6b5e07063B3cd19BEF0d9e9F66d22dB5D517f52a | [🔍](https://etherscan.io/address/0x6b5e07063B3cd19BEF0d9e9F66d22dB5D517f52a)      |
 | UnifiStaking             | 0x90817bCcafAb6D5be9E0198252Ba70C542a91bac | [🔍](https://etherscan.io/address/0x90817bCcafAb6D5be9E0198252Ba70C542a91bac#code) |
 | vTimeLockController      | 0xD8E3c7AcB8c9337B5CEeeC2539a81297B9d5AD96 | [🔍](https://etherscan.io/address/0xD8E3c7AcB8c9337B5CEeeC2539a81297B9d5AD96#code) |
