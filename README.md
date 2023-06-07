@@ -6,7 +6,7 @@ These smart contracts have been designed to facilitate the operation and governa
 
 ### Staking
 
-Staking rewards users for participating in the DAO ecosystem. Initially, 10,000 UNFI will be distributed every 30 days from the Unifi Protocol DAO Treasury. The APR will be determined by the total amount of UNFI staked. There is no cap on how much UNFI can be staked. In the future, the DAO can choose to increase, decrease, or completely remove this incentive.
+Staking rewards users for participating in the DAO ecosystem. Initially, 12,500 UNFI will be distributed every 30 days from the Unifi Protocol DAO Treasury. The APR will be determined by the total amount of UNFI staked. There is no cap on how much UNFI can be staked. In the future, the DAO can choose to increase, decrease, or completely remove this incentive.
 
 ### Governance
 
